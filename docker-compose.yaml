@@ -8,6 +8,8 @@ services:
             dockerfile: docker/Dockerfile
         container_name: panel
         restart: unless-stopped
+        ports:
+            - "${PANEL_EXTERNAL_HTTP_PORT}:80"
         networks:
             - mc_net
 
