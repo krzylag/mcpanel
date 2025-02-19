@@ -24,6 +24,7 @@ services:
         ports:
             - "${JAVA_PORT_R}:${JAVA_PORT_R}"
             - "${BEDROCK_PORT_R}:${BEDROCK_PORT_R}/udp"
+            - "${WEBCONSOLE_PORT_R}:${WEBCONSOLE_PORT_R}/udp"
         environment:
             - TZ='Europe/Warsaw'
             - Port=${JAVA_PORT_R}
@@ -43,6 +44,7 @@ services:
         ports:
             - "${JAVA_PORT_P}:${JAVA_PORT_P}"
             - "${BEDROCK_PORT_P}:${BEDROCK_PORT_P}/udp"
+            - "${WEBCONSOLE_PORT_P}:${WEBCONSOLE_PORT_P}/udp"
         environment:
             - TZ='Europe/Warsaw'
             - Port=${JAVA_PORT_P}
