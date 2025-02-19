@@ -1,0 +1,53 @@
+name: mc
+
+services:
+
+    panel:
+        build:
+            context: .
+            dockerfile: docker/Dockerfile
+        container_name: panel
+        restart: unless-stopped
+        networks:
+            - mc_net
+
+    minecraft-r:
+        image: 05jchambers/legendary-minecraft-purpur-geyser:latest
+        container_name: minecraft-r
+        stdin_open: true
+        tty: true
+        restart: unless-stopped
+        volumes:
+            - "${DATA_FOLDER_R}:/minecraft"
+        ports:
+            - "${JAVA_PORT_R}:${JAVA_PORT_R}"
+            - "${BEDROCK_PORT_R}:${BEDROCK_PORT_R}/udp"
+        environment:
+            - TZ='Europe/Warsaw'
+            - Port=${JAVA_PORT_R}
+            - BedrockPort=${BEDROCK_PORT_R}
+            - MaxMemory=${MAX_MEMORY_R}
+        networks:
+            - mc_net
+
+    minecraft-p:
+        image: 05jchambers/legendary-minecraft-purpur-geyser:latest
+        container_name: minecraft-p
+        stdin_open: true
+        tty: true
+        restart: unless-stopped
+        volumes:
+            - "${DATA_FOLDER_P}:/minecraft"
+        ports:
+            - "${JAVA_PORT_P}:${JAVA_PORT_P}"
+            - "${BEDROCK_PORT_P}:${BEDROCK_PORT_P}/udp"
+        environment:
+            - TZ='Europe/Warsaw'
+            - Port=${JAVA_PORT_P}
+            - BedrockPort=${BEDROCK_PORT_P}
+            - MaxMemory=${MAX_MEMORY_P}
+        networks:
+            - mc_net
+
+networks:
+    mc_net:
