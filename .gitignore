@@ -1,5 +1,6 @@
 .idea
 .vscode
 
+/letsencrypt/*
 /minecraft*
 /.env.local
