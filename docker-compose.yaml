@@ -9,9 +9,55 @@ services:
         container_name: panel
         restart: unless-stopped
         ports:
-            - "${PANEL_EXTERNAL_HTTP_PORT}:80"
+            - "${WEBCONSOLE_EXTERNAL_HTTP_PORT}:80"
         networks:
             - mc_net
+
+    minepass-r:
+        image: gabefraser/minepass:latest
+        container_name: minepass-r
+        restart: unless-stopped
+        ports:
+            - "${MINEPASS_EXTERNAL_HTTP_PORT_R}:8080"
+        environment:
+            - MP_HOST=minecraft-r
+            - MP_PASSWORD=${RCON_PASSWORD_R}
+            - MP_UI_PASSWORD=${MINEPASS_UI_PASSWORD_P}
+            - MP_TITLE='Wpisz hasło aby dodać swojego nicka do białej listy'
+        networks:
+            - mc_net
+
+    minepass-p:
+        image: gabefraser/minepass:latest
+        container_name: minepass-r
+        restart: unless-stopped
+        ports:
+            - "${MINEPASS_EXTERNAL_HTTP_PORT_P}:8080"
+        environment:
+            - MP_HOST=minecraft-p
+            - MP_PASSWORD=${RCON_PASSWORD_P}
+            - MP_UI_PASSWORD=${MINEPASS_UI_PASSWORD_R}
+            - MP_TITLE='Wpisz hasło aby dodać swojego nicka do białej listy'
+        networks:
+            - mc_net
+
+    traefik:
+        image: traefik:v3.3
+        container_name: traefik
+        command:
+            - "--api.insecure=true"
+            - "--providers.docker=true"
+            - "--providers.docker.exposedbydefault=false"
+            - "--entryPoints.websecure.address=:443"
+            - "--certificatesresolvers.myresolver.acme.tlschallenge=true"
+            - "--certificatesresolvers.myresolver.acme.email=${LETSENCRYPT_EMAIL}"
+            - "--certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json"
+        ports:
+            - "443:443"
+            - "8080:8080"
+        volumes:
+            - "./letsencrypt:/letsencrypt"
+            - "/var/run/docker.sock:/var/run/docker.sock:ro"
 
     minecraft-r:
         image: 05jchambers/legendary-minecraft-purpur-geyser:latest
@@ -24,7 +70,9 @@ services:
         ports:
             - "${JAVA_PORT_R}:${JAVA_PORT_R}"
             - "${BEDROCK_PORT_R}:${BEDROCK_PORT_R}/udp"
+            - "${WEBCONSOLE_PORT_R}:${WEBCONSOLE_PORT_R}"
             - "${WEBCONSOLE_PORT_R}:${WEBCONSOLE_PORT_R}/udp"
+            - "${RCON_PORT_R}:${RCON_PORT_R}"
         environment:
             - TZ='Europe/Warsaw'
             - Port=${JAVA_PORT_R}
@@ -44,7 +92,9 @@ services:
         ports:
             - "${JAVA_PORT_P}:${JAVA_PORT_P}"
             - "${BEDROCK_PORT_P}:${BEDROCK_PORT_P}/udp"
+            - "${WEBCONSOLE_PORT_P}:${WEBCONSOLE_PORT_P}"
             - "${WEBCONSOLE_PORT_P}:${WEBCONSOLE_PORT_P}/udp"
+            - "${RCON_PORT_P}:${RCON_PORT_P}"
         environment:
             - TZ='Europe/Warsaw'
             - Port=${JAVA_PORT_P}
