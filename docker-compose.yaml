@@ -2,11 +2,11 @@ name: mc
 
 services:
 
-    panel:
+    webconsole:
         build:
             context: .
             dockerfile: docker/Dockerfile
-        container_name: panel
+        container_name: webconsole
         restart: unless-stopped
         ports:
             - "${WEBCONSOLE_EXTERNAL_HTTP_PORT}:80"
@@ -71,7 +71,6 @@ services:
             - "${JAVA_PORT_R}:${JAVA_PORT_R}"
             - "${BEDROCK_PORT_R}:${BEDROCK_PORT_R}/udp"
             - "${WEBCONSOLE_PORT_R}:${WEBCONSOLE_PORT_R}"
-            - "${WEBCONSOLE_PORT_R}:${WEBCONSOLE_PORT_R}/udp"
             - "${RCON_PORT_R}:${RCON_PORT_R}"
         environment:
             - TZ='Europe/Warsaw'
@@ -93,7 +92,6 @@ services:
             - "${JAVA_PORT_P}:${JAVA_PORT_P}"
             - "${BEDROCK_PORT_P}:${BEDROCK_PORT_P}/udp"
             - "${WEBCONSOLE_PORT_P}:${WEBCONSOLE_PORT_P}"
-            - "${WEBCONSOLE_PORT_P}:${WEBCONSOLE_PORT_P}/udp"
             - "${RCON_PORT_P}:${RCON_PORT_P}"
         environment:
             - TZ='Europe/Warsaw'
