@@ -29,7 +29,7 @@ services:
 
     minepass-p:
         image: gabefraser/minepass:latest
-        container_name: minepass-r
+        container_name: minepass-p
         restart: unless-stopped
         ports:
             - "${MINEPASS_EXTERNAL_HTTP_PORT_P}:8080"
