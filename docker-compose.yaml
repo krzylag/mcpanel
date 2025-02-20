@@ -5,7 +5,7 @@ services:
     webconsole:
         build:
             context: .
-            dockerfile: docker/Dockerfile
+            dockerfile: docker/webpanel/Dockerfile
         container_name: webconsole
         restart: unless-stopped
         ports:
@@ -14,7 +14,9 @@ services:
             - mc_net
 
     minepass-r:
-        image: gabefraser/minepass:latest
+        build:
+            context: .
+            dockerfile: docker/minepass/Dockerfile
         container_name: minepass-r
         restart: unless-stopped
         ports:
@@ -28,7 +30,9 @@ services:
             - mc_net
 
     minepass-p:
-        image: gabefraser/minepass:latest
+        build:
+            context: .
+            dockerfile: docker/minepass/Dockerfile
         container_name: minepass-p
         restart: unless-stopped
         ports:
