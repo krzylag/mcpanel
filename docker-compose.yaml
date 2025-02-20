@@ -12,6 +12,11 @@ services:
             - "${WEBCONSOLE_EXTERNAL_HTTP_PORT}:80"
         networks:
             - mc_net
+        labels:
+            - "traefik.enable=true"
+            - "traefik.http.routers.whoami.rule=Host(`oraclevm.lagan.net.pl`)"
+            - "traefik.http.routers.whoami.entrypoints=websecure"
+            - "traefik.http.routers.whoami.tls.certresolver=myresolver"
 
     minepass-r:
         build:
@@ -28,6 +33,11 @@ services:
             - MP_TITLE='Wpisz hasło aby dodać swojego nicka do białej listy'
         networks:
             - mc_net
+        labels:
+            - "traefik.enable=true"
+            - "traefik.http.routers.whoami.rule=Host(`s5c.lagan.net.pl`)"
+            - "traefik.http.routers.whoami.entrypoints=websecure"
+            - "traefik.http.routers.whoami.tls.certresolver=myresolver"
 
     minepass-p:
         build:
@@ -44,6 +54,11 @@ services:
             - MP_TITLE='Wpisz hasło aby dodać swojego nicka do białej listy'
         networks:
             - mc_net
+        labels:
+            - "traefik.enable=true"
+            - "traefik.http.routers.whoami.rule=Host(`s2c.lagan.net.pl`)"
+            - "traefik.http.routers.whoami.entrypoints=websecure"
+            - "traefik.http.routers.whoami.tls.certresolver=myresolver"
 
     traefik:
         image: traefik:v3.3
@@ -58,7 +73,7 @@ services:
             - "--certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json"
         ports:
             - "443:443"
-            - "8080:8080"
+            - "${TRAEFIK_EXTERNAL_HTTP_PORT}:8080"
         volumes:
             - "./letsencrypt:/letsencrypt"
             - "/var/run/docker.sock:/var/run/docker.sock:ro"
