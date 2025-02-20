@@ -2,11 +2,11 @@ FROM golang:1.18 as builder
 
 WORKDIR /app
 
-COPY go.mod go.sum ./
+COPY ./docker/minepass/go.mod ./docker/minepass/go.sum ./
 
 RUN go mod download
 
-COPY . .
+COPY ./docker/minepass .
 
 RUN CGO_ENABLED=0 GOOS=linux go build -o minepass .
 
@@ -16,9 +16,9 @@ WORKDIR /root
 
 COPY --from=builder /app/minepass .
 
-COPY templates templates
+COPY ./docker/minepass/templates templates
 
-COPY assets assets
+COPY ./docker/minepass/assets assets
 
 EXPOSE 8080
 
