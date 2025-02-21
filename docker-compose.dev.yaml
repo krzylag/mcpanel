@@ -1,0 +1,35 @@
+name: mc
+
+services:
+
+    accesspanel:
+        extends:
+            file: docker-compose.yaml
+            service: accesspanel
+        volumes:
+            - type: bind
+              source: .
+              target: /var/www/html
+
+    database:
+        extends:
+            file: docker-compose.yaml
+            service: database
+        ports:
+            - "${DEV_DATABASE_EXTERNAL_PORT}:3306"
+
+    minecraft-r:
+        extends:
+            file: docker-compose.yaml
+            service: minecraft-r
+
+    minecraft-p:
+        extends:
+            file: docker-compose.yaml
+            service: minecraft-p
+
+volumes:
+    database-data:
+
+networks:
+    mc_net:

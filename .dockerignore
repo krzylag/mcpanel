@@ -1,0 +1,9 @@
+.idea
+.vscode
+
+/letsencrypt/*
+/minecraft*
+
+/public/bundles/
+/var/
+/vendor/
