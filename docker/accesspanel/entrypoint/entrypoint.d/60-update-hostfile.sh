@@ -1,6 +1,6 @@
 #!/bin/bash
 
-HOST_NAMES=("accesspanel" "minecraft-r" "minecraft-p")
+HOST_NAMES=("accesspanel" "database" "minecraft-r" "minecraft-p")
 
 TEMP_HOST_FILE=/tmp/hostfile_$(date +%y-%m-%d_%H-%M-%S)
 cat /etc/hosts > "$TEMP_HOST_FILE"

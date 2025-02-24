@@ -14,7 +14,8 @@ else
 endif
 
 build:
-	${DOCKER_COMPOSE_CMD} build
+	#${DOCKER_COMPOSE_CMD} build
+	${DOCKER_COMPOSE_CMD} build --no-cache
 
 up:
 	${DOCKER_COMPOSE_CMD} up -d
@@ -25,6 +26,18 @@ down:
 cc:
 	${DOCKER_COMPOSE_CMD} exec accesspanel bash -c "./bin/console cache:clear"
 	${DOCKER_COMPOSE_CMD} exec accesspanel bash -c "chmod -R g+w,o+w /var/www/html"
+
+init-db:
+	${DOCKER_COMPOSE_CMD} exec accesspanel bash -c "sudo -u www-data ./bin/console doctrine:database:drop --force"
+	${DOCKER_COMPOSE_CMD} exec accesspanel bash -c "sudo -u www-data ./bin/console doctrine:database:create --no-interaction"
+	${DOCKER_COMPOSE_CMD} exec accesspanel bash -c "sudo -u www-data ./bin/console doctrine:migrations:migrate --no-interaction"
+	${DOCKER_COMPOSE_CMD} exec accesspanel bash -c "sudo -u www-data ./bin/console doctrine:fixtures:load --no-interaction"
+
+npm-build:
+	${DOCKER_COMPOSE_CMD} exec accesspanel bash -c "sudo -u www-data npm run build"
+
+migration:
+	${DOCKER_COMPOSE_CMD} exec accesspanel bash -c "sudo -u www-data ./bin/console make:migration --no-interaction"
 
 bash:
 	${DOCKER_COMPOSE_CMD} exec accesspanel bash

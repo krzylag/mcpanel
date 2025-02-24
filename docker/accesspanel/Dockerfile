@@ -2,10 +2,11 @@ FROM php:8.3-fpm AS build-base
 
 ARG TERM=linux
 ARG DEBIAN_FRONTEND=noninteractive
+ARG NODE_MAJOR_VERSION=22
 
 # Install container tools
 RUN apt-get update && apt-get upgrade -y && apt-get install -y \
-    wget curl net-tools iproute2 supervisor graphviz unzip nginx vim git \
+    sudo wget curl net-tools iproute2 supervisor graphviz unzip nginx vim git \
     ca-certificates curl gnupg2
 
 ADD --chmod=0755 https://github.com/mlocati/docker-php-extension-installer/releases/latest/download/install-php-extensions /usr/local/bin/
@@ -15,7 +16,7 @@ COPY ./docker/accesspanel/php/conf.d/* /usr/local/etc/php/conf.d/
 
 COPY --from=composer/composer:2 /usr/bin/composer /usr/local/bin/composer
 
-RUN install-php-extensions intl mysqli mbstring curl opcache apcu
+RUN install-php-extensions intl pdo_mysql mysqli mbstring curl opcache apcu
 
 # Install Symfony tool
 RUN curl -sS https://get.symfony.com/cli/installer > /symfony-installer
@@ -41,6 +42,13 @@ COPY ./docker/accesspanel/entrypoint/entrypoint.d/* /entrypoint.d/
 RUN chmod -R +x /entrypoint.d/*
 COPY ./docker/accesspanel/entrypoint/entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
+
+# Install nodejs
+COPY ./docker/accesspanel/apt/nodesource_apt_pinning /etc/apt/preferences.d/
+RUN mkdir -p /etc/apt/keyrings
+RUN curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | sudo gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg
+RUN echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_$NODE_MAJOR_VERSION.x nodistro main" > /etc/apt/sources.list.d/nodesource.list
+RUN apt-get -y update && apt-get -y install nodejs
 
 WORKDIR /var/www/html
 

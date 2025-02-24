@@ -11,12 +11,18 @@
         "doctrine/doctrine-bundle": "^2.13",
         "doctrine/doctrine-migrations-bundle": "^3.4",
         "doctrine/orm": "^3.3",
+        "stof/doctrine-extensions-bundle": "^1.13",
         "symfony/console": "7.2.*",
         "symfony/dotenv": "7.2.*",
         "symfony/flex": "^2",
+        "symfony/form": "7.2.*",
         "symfony/framework-bundle": "7.2.*",
         "symfony/monolog-bundle": "^3.10",
         "symfony/runtime": "7.2.*",
+        "symfony/security-bundle": "7.2.*",
+        "symfony/translation": "7.2.*",
+        "symfony/validator": "7.2.*",
+        "symfony/webpack-encore-bundle": "^2.2",
         "symfony/yaml": "7.2.*"
     },
     "config": {
@@ -73,6 +79,7 @@
         }
     },
     "require-dev": {
+        "doctrine/doctrine-fixtures-bundle": "^4.0",
         "symfony/debug-bundle": "7.2.*",
         "symfony/maker-bundle": "^1.62",
         "symfony/stopwatch": "7.2.*",

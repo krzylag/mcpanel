@@ -1,0 +1,10 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Zarejestruj się{% endblock %}
+
+{% block body %}
+    {% if error %}
+        <div class="alert alert-danger">{{ error|trans() }}</div>
+    {% endif %}
+    {{ form(registrationForm) }}
+{% endblock %}

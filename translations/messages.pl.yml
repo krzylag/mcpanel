@@ -1,0 +1,7 @@
+tenant:
+    tenant_r:
+        name: Rafał
+    tenant_p:
+        name: Serwer klasy 2c
+
+wrong_password: Błędne hasło!
