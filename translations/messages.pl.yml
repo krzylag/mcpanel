@@ -5,3 +5,9 @@ tenant:
         name: Serwer klasy 2c
 
 wrong_password: Błędne hasło!
+
+
+dashboard:
+    menu:
+        users: Administratorzy
+        tenants: Serwery

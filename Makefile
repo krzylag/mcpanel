@@ -40,7 +40,7 @@ migration:
 	${DOCKER_COMPOSE_CMD} exec accesspanel bash -c "sudo -u www-data ./bin/console make:migration --no-interaction"
 
 bash:
-	${DOCKER_COMPOSE_CMD} exec accesspanel bash
+	${DOCKER_COMPOSE_CMD} exec accesspanel bash -c "sudo -u www-data bash"
 
 stop-game:
 	${DOCKER_COMPOSE_CMD} stop minecraft-r
