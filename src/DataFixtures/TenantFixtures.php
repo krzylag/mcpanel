@@ -13,20 +13,22 @@ class TenantFixtures extends Fixture
     public const string PREFIX = 'tenant_';
 
     private const array DEFINITIONS = [
-        'tenant_r' => [
-            'host' => 'minecraft-r',
-            'domain' => 'localhost',
+        [
+            'name' => 'Serwer typu R',
+            'mcHost' => 'minecraft-r',
+            'domains' => ['localhost', 'r.localhost'],
             'rconPort' => 25576,
-            'rconPassword' => 'secretr',
+            'rconPassword' => 'ser',
             'registrationPassword' => 'secret1',
             'bedrockPort' => 19133,
             'javaPort' => 25566,
         ],
         'tenant_p' => [
-            'host' => 'minecraft-p',
-            'domain' => 'localhost',
+            'name' => 'S2C',
+            'mcHost' => 'minecraft-p',
+            'domains' => ['localhost', 'p.localhost'],
             'rconPort' => 25577,
-            'rconPassword' => 'secretp',
+            'rconPassword' => 'sep',
             'registrationPassword' => 'secret2',
             'bedrockPort' => 19134,
             'javaPort' => 25567,
@@ -35,20 +37,20 @@ class TenantFixtures extends Fixture
 
     public function load(ObjectManager $manager): void
     {
-        foreach (self::DEFINITIONS as $name => $data) {
-            $tenant = $this->createTenant($name, $data);
+        foreach (self::DEFINITIONS as $data) {
+            $tenant = $this->createTenant($data);
             $manager->persist($tenant);
-            $this->addReference(self::PREFIX . $name, $tenant);
+            $this->addReference(self::PREFIX . $tenant->getName(), $tenant);
         }
         $manager->flush();
     }
 
-    private function createTenant(string $name, array $data): Tenant
+    private function createTenant(array $data): Tenant
     {
         $tenant = new Tenant();
-        $tenant->setName($name);
-        $tenant->setHost($data['host']);
-        $tenant->setExternalDomain($data['domain']);
+        $tenant->setName($data['name']);
+        $tenant->setMcHost($data['mcHost']);
+        $tenant->setDomains($data['domains']);
         $tenant->setRconPort($data['rconPort']);
         $tenant->setRconPassword($data['rconPassword']);
         $tenant->setRegistrationPassword($data['registrationPassword']);

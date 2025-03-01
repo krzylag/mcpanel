@@ -19,14 +19,14 @@ class Tenant
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(length: 255, nullable: false)]
     private ?string $name = null;
 
-    #[ORM\Column(length: 255)]
-    private ?string $host = null;
+    #[ORM\Column(length: 255, nullable: false)]
+    private ?string $mcHost = null;
 
-    #[ORM\Column(length: 255, nullable: true)]
-    private ?string $externalDomain = null;
+    #[ORM\Column]
+    private array $domains = [];
 
     #[ORM\Column(nullable: true)]
     private ?int $rconPort = null;
@@ -44,14 +44,14 @@ class Tenant
     private ?int $javaPort = null;
 
     /**
-     * @var Collection<int, TenantUser>
+     * @var Collection<int, User>
      */
-    #[ORM\OneToMany(targetEntity: TenantUser::class, mappedBy: 'tenant', orphanRemoval: true)]
-    private Collection $tenantUsers;
+    #[ORM\ManyToMany(targetEntity: User::class, mappedBy: 'tenants')]
+    private Collection $users;
 
     public function __construct()
     {
-        $this->tenantUsers = new ArrayCollection();
+        $this->users = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -71,27 +71,28 @@ class Tenant
         return $this;
     }
 
-    public function getHost(): ?string
+    public function getMcHost(): ?string
     {
-        return $this->host;
+        return $this->mcHost;
     }
 
-    public function setHost(string $host): static
+    public function setMcHost(string $mcHost): static
     {
-        $this->host = $host;
+        $this->mcHost = $mcHost;
 
         return $this;
     }
 
-    public function getExternalDomain(): ?string
+    public function getDomains(): array
     {
-        return $this->externalDomain;
+        return $this->domains;
     }
 
-    public function setExternalDomain(string $externalDomain): static
+    public function setDomains(array $domains): static
     {
-        $this->externalDomain = $externalDomain;
-
+        $domains = array_map('trim', $domains);
+        sort($domains);
+        $this->domains = array_values(array_unique($domains));
         return $this;
     }
 
@@ -151,31 +152,26 @@ class Tenant
         $this->javaPort = $javaPort;
     }
 
-    /**
-     * @return Collection<int, TenantUser>
-     */
-    public function getTenantUsers(): Collection
+    /** @return Collection<int, User> */
+    public function getUsers(): Collection
     {
-        return $this->tenantUsers;
+        return $this->users;
     }
 
-    public function addTenantUser(TenantUser $tenantUser): static
+    public function addUser(User $user): static
     {
-        if (!$this->tenantUsers->contains($tenantUser)) {
-            $this->tenantUsers->add($tenantUser);
-            $tenantUser->setTenant($this);
+        if (!$this->users->contains($user)) {
+            $this->users->add($user);
+            $user->addTenant($this);
         }
 
         return $this;
     }
 
-    public function removeTenantUser(TenantUser $tenantUser): static
+    public function removeUser(User $user): static
     {
-        if ($this->tenantUsers->removeElement($tenantUser)) {
-            // set the owning side to null (unless already changed)
-            if ($tenantUser->getTenant() === $this) {
-                $tenantUser->setTenant(null);
-            }
+        if ($this->users->removeElement($user)) {
+            $user->removeTenant($this);
         }
 
         return $this;

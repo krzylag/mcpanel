@@ -28,6 +28,23 @@ services:
             file: docker-compose.yaml
             service: minecraft-p
 
+    phpmyadmin:
+        image: phpmyadmin:latest
+        container_name: pmnator-phpmyadmin
+        restart: unless-stopped
+        links:
+            -   database
+        environment:
+            PMA_HOST: database
+            PMA_USER: root
+            PMA_PASSWORD: ${DATABASE_ROOT_PASSWORD}
+            UPLOAD_LIMIT: 2000M
+            MEMORY_LIMIT: 4000M
+        ports:
+            - "${DEV_PHPMYADMIN_EXTERNAL_PORT}:80"
+        networks:
+            - mc_net
+
 volumes:
     database-data:
 

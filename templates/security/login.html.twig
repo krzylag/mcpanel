@@ -1,17 +1,47 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Zaloguj się{% endblock %}
+{% block title %}Log in!{% endblock %}
 
 {% block body %}
-    <div class="container mt-4">
+    <div class="container">
 
-        {{ form_label(form.username) }}
-        {{ form_widget(form.username) }}
+        {% if error %}
+            <div class="alert alert-danger">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
+        {% endif %}
 
-        {{ form_label(form.password) }}
-        {{ form_widget(form.password) }}
+        {% if app.user %}
+            <div class="mb-3">
+                You are logged in as {{ app.user.userIdentifier }}, <a href="{{ path('app_logout') }}">Logout</a>
+            </div>
+        {% endif %}
+
+            <div class="tab-pane fade show active" id="player" role="tabpanel" aria-labelledby="player-tab">
+                <h1 class="h3 mb-3 font-weight-normal">{{ 'login.form.title'|trans }}</h1>
+                <form method="post">
+                    <div>
+                        <label for="tenant">{{ 'login.form.tenant'|trans }}</label>
+                        <select name="tenant" id="tenant">
+                            {% for tenant in tenants %}
+                                <option value="{{ tenant.id }}">{{ tenant.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div>
+                        <label for="username">{{ 'login.form.username'|trans }}</label>
+                        <input type="text" value="{{ last_username }}" name="username" id="username" class="form-control" required autofocus>
+                    </div>
+                    <div>
+                        <label for="password">{{ 'login.form.password'|trans }}</label>
+                        <input type="password" name="password" id="password" class="form-control" required>
+                    </div>
+                    <div>
+                        <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+                        <button class="btn btn-lg btn-primary" type="submit">{{ 'login.form.submit'|trans }}</button>
+                    </div>
+                </form>
+            </div>
+        </div>
 
 
-        {{ form_widget(form.submit) }}
     </div>
 {% endblock %}

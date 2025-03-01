@@ -17,7 +17,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     use TimestampableEntityTrait;
 
     public const string ROLE_USER = 'ROLE_USER';
+    public const string ROLE_PLAYER = 'ROLE_PLAYER';
     public const string ROLE_ADMIN = 'ROLE_ADMIN';
+    public const string ROLE_SUPER_ADMIN = 'ROLE_SUPER_ADMIN';
 
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -30,18 +32,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column]
     private array $roles = [];
 
-    #[ORM\Column]
+    #[ORM\Column(nullable: true)]
     private ?string $password = null;
 
     /**
-     * @var Collection<int, TenantUser>
+     * @var Collection<int, Tenant>
      */
-    #[ORM\OneToMany(targetEntity: TenantUser::class, mappedBy: 'user', orphanRemoval: true)]
-    private Collection $tenantUsers;
+    #[ORM\ManyToMany(targetEntity: Tenant::class, inversedBy: 'users', fetch: 'EAGER')]
+    private Collection $tenants;
 
     public function __construct()
     {
-        $this->tenantUsers = new ArrayCollection();
+        $this->tenants = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -67,14 +69,24 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function getRoles(): array
     {
-        $roles = $this->roles;
-        $roles[] = self::ROLE_USER;
-        return array_unique($roles);
+        return $this->roles;
     }
 
     public function setRoles(array $roles): static
     {
-        $this->roles = $roles;
+        if (!in_array(self::ROLE_USER, $roles)) {
+            $roles[] = self::ROLE_USER;
+        }
+        sort($roles);
+        $this->roles = array_values(array_unique($roles));
+        return $this;
+    }
+
+    public function addRole(string $role): static
+    {
+        $this->setRoles(
+            array_merge($this->getRoles(), [$role])
+        );
         return $this;
     }
 
@@ -83,7 +95,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->password;
     }
 
-    public function setPassword(string $password): static
+    public function setPassword(?string $password): static
     {
         $this->password = $password;
         return $this;
@@ -99,31 +111,25 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     }
 
     /**
-     * @return Collection<int, TenantUser>
+     * @return Collection<int, Tenant>
      */
-    public function getTenantUsers(): Collection
+    public function getTenants(): Collection
     {
-        return $this->tenantUsers;
+        return $this->tenants;
     }
 
-    public function addTenantUser(TenantUser $tenantUser): static
+    public function addTenant(Tenant $tenant): static
     {
-        if (!$this->tenantUsers->contains($tenantUser)) {
-            $this->tenantUsers->add($tenantUser);
-            $tenantUser->setUser($this);
+        if (!$this->tenants->contains($tenant)) {
+            $this->tenants->add($tenant);
         }
 
         return $this;
     }
 
-    public function removeTenantUser(TenantUser $tenantUser): static
+    public function removeTenant(Tenant $tenant): static
     {
-        if ($this->tenantUsers->removeElement($tenantUser)) {
-            // set the owning side to null (unless already changed)
-            if ($tenantUser->getUser() === $this) {
-                $tenantUser->setUser(null);
-            }
-        }
+        $this->tenants->removeElement($tenant);
 
         return $this;
     }

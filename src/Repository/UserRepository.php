@@ -33,7 +33,33 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
         $this->getEntityManager()->flush();
     }
 
-    //    /**
+    public function findUserWithTenant(string $username, int $tenantId): ?User
+    {
+        return $this->createQueryBuilder('u')
+            ->leftJoin('u.tenants', 't')
+            ->andWhere('u.username = :username')
+            ->andWhere('(u.roles LIKE :roleSuperAdmin OR t.id = :tenantId)')
+            ->setParameter('username', $username)
+            ->setParameter('tenantId', $tenantId)
+            ->setParameter('roleSuperAdmin', sprintf('%%%s%%',User::ROLE_SUPER_ADMIN))
+            ->setMaxResults(1)
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
+
+    public function findOneByIdentity(string $username1, ?string $username2 = null): ?User
+    {
+        $usernames = array_filter([$username1, $username2]);
+        if (count($usernames) === 0) {
+            return null;
+        }
+        return $this->createQueryBuilder('u')
+            ->andWhere('(u.username IN (:usernames) OR u.email IN (:usernames))')
+            ->setMaxResults(1)
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
+    //    /**S
     //     * @return User[] Returns an array of User objects
     //     */
     //    public function findByExampleField($value): array

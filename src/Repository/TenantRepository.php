@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\Tenant;
+use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -16,28 +17,20 @@ class TenantRepository extends ServiceEntityRepository
         parent::__construct($registry, Tenant::class);
     }
 
-    //    /**
-    //     * @return Tenant[] Returns an array of Tenant objects
-    //     */
-    //    public function findByExampleField($value): array
-    //    {
-    //        return $this->createQueryBuilder('t')
-    //            ->andWhere('t.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->orderBy('t.id', 'ASC')
-    //            ->setMaxResults(10)
-    //            ->getQuery()
-    //            ->getResult()
-    //        ;
-    //    }
+    public function findFiltered(?string $domain = null, ?User $user = null): array
+    {
+        $qb = $this->createQueryBuilder('t');
 
-    //    public function findOneBySomeField($value): ?Tenant
-    //    {
-    //        return $this->createQueryBuilder('t')
-    //            ->andWhere('t.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->getQuery()
-    //            ->getOneOrNullResult()
-    //        ;
-    //    }
+        if ($domain !== null) {
+            $qb->andWhere('t.domains LIKE :domain')
+                ->setParameter('domain', sprintf('%%"%s"%%', $domain));
+        }
+
+        if ($user !== null) {
+            $qb->leftJoin('t.user', 'u')
+                ->andWhere('u = :user')->setParameter('user', $user);
+        }
+
+        return $qb->getQuery()->getResult();
+    }
 }

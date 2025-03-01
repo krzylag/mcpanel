@@ -4,27 +4,61 @@ declare(strict_types=1);
 
 namespace App\DataFixtures;
 
+use App\Entity\Tenant;
 use App\Entity\User;
 use Doctrine\Bundle\FixturesBundle\Fixture;
+use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
-class UserFixtures extends Fixture
+class UserFixtures extends Fixture implements DependentFixtureInterface
 {
     public const string PREFIX = 'user_';
 
     private const array DEFINITIONS = [
-        'admin1' => [
+        [
+            'name' => 'admin',
             'password' => 'secret',
+            'roles' => ['ROLE_SUPER_ADMIN'],
+            'tenants' => [],
+        ],
+        [
+            'name' => 'adminr',
+            'password' => 'secretr',
             'roles' => ['ROLE_ADMIN'],
+            'tenants' => [
+                'Serwer typu R'
+            ],
         ],
-        'user1' => [
-            'password' => 'secret',
-            'roles' => ['ROLE_USER'],
+        [
+            'name' => 'adminp',
+            'password' => 'secretp',
+            'roles' => ['ROLE_ADMIN'],
+            'tenants' => [
+                'S2C'
+            ],
         ],
-        'user2' => [
-            'password' => 'secret',
-            'roles' => ['ROLE_USER'],
+        [
+            'name' => 'Ciemnyzenek',
+            'roles' => ['ROLE_PLAYER'],
+            'tenants' => [
+                'Serwer typu R',
+                'S2C',
+            ],
+        ],
+        [
+            'name' => 'GraczR',
+            'roles' => ['ROLE_PLAYER'],
+            'tenants' => [
+                'Serwer typu R',
+            ],
+        ],
+        [
+            'name' => 'GraczP',
+            'roles' => ['ROLE_PLAYER'],
+            'tenants' => [
+                'S2C',
+            ],
         ],
     ];
 
@@ -35,20 +69,34 @@ class UserFixtures extends Fixture
 
     public function load(ObjectManager $manager): void
     {
-        foreach (self::DEFINITIONS as $name => $data) {
-            $user = $this->createUser($name, $data);
+        foreach (self::DEFINITIONS as $data) {
+            $user = $this->createUser($data);
             $manager->persist($user);
-            $this->addReference(self::PREFIX . $name, $user);
+            foreach ($data['tenants'] as $tenantName) {
+                $tenant = $this->getReference(TenantFixtures::PREFIX . $tenantName, Tenant::class);
+                $user->addTenant($tenant);
+            }
+            $this->addReference(self::PREFIX . $user->getUsername(), $user);
         }
         $manager->flush();
     }
 
-    private function createUser(string $username, array $data): User
+    private function createUser(array $data): User
     {
         $user = new User();
-        $user->setUsername($username);
-        $password = $this->hasher->hashPassword($user, $data['password']);
-        $user->setPassword($password);
+        $user->setUsername($data['name']);
+        if (isset($data['password'])) {
+            $password = $this->hasher->hashPassword($user, $data['password']);
+            $user->setPassword($password);
+        }
+        $user->setRoles($data['roles'] ?? []);
         return $user;
+    }
+
+    public function getDependencies(): array
+    {
+        return [
+            TenantFixtures::class,
+        ];
     }
 }

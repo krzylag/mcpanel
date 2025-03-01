@@ -64,6 +64,7 @@ RUN rm /usr/local/etc/php/php.ini-production
 
 # Additional PHP modules for development
 RUN install-php-extensions xdebug
+COPY ./docker/accesspanel/php/conf.d-dev/* /usr/local/etc/php/conf.d/
 
 # Additional entrypoint scripts for development
 COPY ./docker/accesspanel/entrypoint/entrypoint.d-dev/* /entrypoint.d/

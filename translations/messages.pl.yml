@@ -11,3 +11,15 @@ dashboard:
     menu:
         users: Administratorzy
         tenants: Serwery
+
+
+login:
+    tab:
+        player: Gracz
+        user: Administrator
+    form:
+        title: Dołączanie do serwera
+        tenant: Wybierz serwer
+        username: Nick gracza (lub email administratora)
+        password: Hasło
+        submit: Wchodzę!
