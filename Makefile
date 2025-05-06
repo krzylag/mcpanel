@@ -14,8 +14,8 @@ else
 endif
 
 build:
-	#${DOCKER_COMPOSE_CMD} build
-	${DOCKER_COMPOSE_CMD} build --no-cache
+	${DOCKER_COMPOSE_CMD} build
+	#${DOCKER_COMPOSE_CMD} build --no-cache
 
 up:
 	${DOCKER_COMPOSE_CMD} up -d
