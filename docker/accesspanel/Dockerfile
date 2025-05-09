@@ -7,7 +7,7 @@ ARG NODE_MAJOR_VERSION=22
 # Install container tools
 RUN apt-get update && apt-get upgrade -y && apt-get install -y \
     sudo wget curl net-tools iproute2 supervisor graphviz unzip nginx vim git \
-    ca-certificates curl gnupg2
+    ca-certificates curl gnupg2 rcon
 
 ADD --chmod=0755 https://github.com/mlocati/docker-php-extension-installer/releases/latest/download/install-php-extensions /usr/local/bin/
 
@@ -76,6 +76,6 @@ RUN mv /usr/local/etc/php/php.ini-production /usr/local/etc/php/php.ini
 RUN rm /usr/local/etc/php/php.ini-development
 
 # Build project
-COPY ./* /var/www/html
+COPY application/* /var/www/html
 RUN git config --global --add safe.directory /var/www/html
 RUN composer install --no-interaction

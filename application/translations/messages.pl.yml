@@ -1,0 +1,26 @@
+tenant:
+    tenant_r:
+        name: Rafał
+    tenant_p:
+        name: Serwer klasy 2c
+
+wrong_password: Błędne hasło!
+
+
+dashboard:
+    menu:
+        users: Administratorzy
+        tenants: Serwery
+        web_console: Konsola
+
+
+login:
+    tab:
+        player: Gracz
+        user: Administrator
+    form:
+        title: Dołączanie do serwera
+        tenant: Wybierz serwer
+        username: Nick gracza (lub email administratora)
+        password: Hasło
+        submit: Wchodzę!

@@ -8,7 +8,7 @@ services:
             service: accesspanel
         volumes:
             - type: bind
-              source: .
+              source: application
               target: /var/www/html
 
     database:
@@ -35,7 +35,7 @@ services:
 
     phpmyadmin:
         image: phpmyadmin:latest
-        container_name: pmnator-phpmyadmin
+        container_name: phpmyadmin
         restart: unless-stopped
         links:
             - database

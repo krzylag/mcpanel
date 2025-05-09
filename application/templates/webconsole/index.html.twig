@@ -1,0 +1,55 @@
+{% extends '@!EasyAdmin/layout.html.twig' %}
+
+{% block content_title %}{{ tenant.name }}{% endblock %}
+
+{% block main %}
+    <div class="container">
+        <div class="input-group mb-3">
+            <input type="text" class="form-control" placeholder="Komenda" aria-label="Komenda" id="command">
+            <div class="input-group-append">
+                <button type="button" id="run" class="btn btn-primary">Run</button>
+            </div>
+        </div>
+        <pre class="w-100 mt-2" id="response"></pre>
+    </div>
+    <script>
+        $(document).ready(function() {
+
+            const commandInput = $('#command');
+            const runButton = $('#run');
+            const responseArea = $('#response');
+
+            runButton.click(function() {
+                runCommand(
+                    commandInput.val()
+                );
+            });
+
+            commandInput.keypress(function(event) {
+                if (event.keyCode === 13) {
+                    event.preventDefault();
+                    runCommand(commandInput.val());
+                }
+            });
+
+            function runCommand(command) {
+                if (command) {
+                    $.ajax({
+                        url: '{{ path('app_admin_webconsole_send_command') }}',
+                        type: 'POST',
+                        data: {
+                            tenant: {{ tenant.id }},
+                            command: command
+                        },
+                        success: function(response) {
+                            responseArea.html(response.raw);
+                        },
+                        error: function(xhr, status, error) {
+                            alert('Error: ' + error);
+                        }
+                    });
+                }
+            }
+        });
+    </script>
+{% endblock %}

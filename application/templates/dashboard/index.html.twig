@@ -1,0 +1,35 @@
+{% extends '@!EasyAdmin/layout.html.twig' %}
+
+{% block content_title %}daszbord{% endblock %}
+
+{% block main %}
+    <div class="container">
+        <table class="table">
+            <thead>
+                <th>Bedrock</th>
+                <th>Java</th>
+                <th>Host</th>
+                <th>Hasło rejestracyjne</th>
+            </thead>
+            <tbody>
+                {% for tenant in tenants %}
+                    <tr>
+                        <td>
+                            {% for domain in tenant.domains %}
+                                <div>{{ domain }}:{{ tenant.bedrockPort }}</div>
+                            {% endfor %}
+                        </td>
+                        <td>
+                            {% for domain in tenant.domains %}
+                                <div>{{ domain }}:{{ tenant.javaPort }}</div>
+                            {% endfor %}
+                        </td>
+                        <td>{{ tenant.host }}</td>
+                        <td>{{ tenant.tenantEntity.registrationPassword }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+{% endblock %}
