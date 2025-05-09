@@ -4,7 +4,7 @@ include application/.env.local
 export $(shell sed 's/=.*//' application/.env)
 export $(shell sed 's/=.*//' application/.env.local)
 
-DOCKER_COMPOSE_CMD_PROD=docker compose --progress plain --env-file application/.env --env-file application/.env.local -f docker-compose.yaml
+DOCKER_COMPOSE_CMD_PROD=docker compose --progress plain --env-file application/.env --env-file application/.env.prod --env-file application/.env.local -f docker-compose.yaml
 DOCKER_COMPOSE_CMD_DEV=docker compose --progress plain --env-file application/.env --env-file application/.env.local -f docker-compose.dev.yaml
 
 ifeq ("$(APP_ENV)","prod")
@@ -25,14 +25,15 @@ down:
 
 cc:
 	${DOCKER_COMPOSE_CMD} exec accesspanel bash -c "chown -R www-data:www-data /var/www/html/var"
-	${DOCKER_COMPOSE_CMD} exec accesspanel bash -c "sudo -u www-data ./bin/console cache:clear"
+	${DOCKER_COMPOSE_CMD} exec accesspanel bash -c "sudo -E -u www-data ./bin/console cache:clear"
 	${DOCKER_COMPOSE_CMD} exec accesspanel bash -c "chmod -R g+w,o+w /var/www/html"
+	${DOCKER_COMPOSE_CMD} exec accesspanel bash -c "rm -rf /var/www/html/var/log/*"
 
 init-db:
-	${DOCKER_COMPOSE_CMD} exec accesspanel bash -c "sudo -u www-data ./bin/console doctrine:database:drop --force"
-	${DOCKER_COMPOSE_CMD} exec accesspanel bash -c "sudo -u www-data ./bin/console doctrine:database:create --no-interaction"
-	${DOCKER_COMPOSE_CMD} exec accesspanel bash -c "sudo -u www-data ./bin/console doctrine:migrations:migrate --no-interaction"
-	${DOCKER_COMPOSE_CMD} exec accesspanel bash -c "sudo -u www-data ./bin/console doctrine:fixtures:load --no-interaction"
+	${DOCKER_COMPOSE_CMD} exec accesspanel bash -c "sudo -E -u www-data ./bin/console doctrine:database:drop --force"
+	${DOCKER_COMPOSE_CMD} exec accesspanel bash -c "sudo -E -u www-data ./bin/console doctrine:database:create --no-interaction"
+	${DOCKER_COMPOSE_CMD} exec accesspanel bash -c "sudo -E -u www-data ./bin/console doctrine:migrations:migrate --no-interaction"
+	${DOCKER_COMPOSE_CMD} exec accesspanel bash -c "sudo -E -u www-data ./bin/console doctrine:fixtures:load --no-interaction"
 
 npm-build:
 	${DOCKER_COMPOSE_CMD} exec accesspanel bash -c "sudo -u www-data npm run build"

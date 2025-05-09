@@ -10,6 +10,11 @@ services:
             context: .
             dockerfile: docker/accesspanel/Dockerfile
             target: build-dev
+        labels:
+            - "traefik.enable=true"
+            - "traefik.http.routers.whoami.entrypoints=${TRAEFIK_ENTRYPOINT}"
+            - "traefik.http.routers.whoami.tls=false"
+            - "traefik.http.routers.whoami.rule=Host(`${EXTERNAL_DOMAIN_R}`) || Host(`${EXTERNAL_DOMAIN_P}`) || Host(`${EXTERNAL_DOMAIN_K}`)"
         volumes:
             - type: bind
               source: application
@@ -21,6 +26,34 @@ services:
             service: database
         ports:
             - "${DEV_DATABASE_EXTERNAL_PORT}:3306"
+
+    traefik:
+        image: traefik:v3.3
+        container_name: traefik
+        command:
+            - "--api.insecure=true"
+            - "--api.dashboard=true"
+            - "--log.level=DEBUG"
+            - "--log.filepath=/var/log/traefik.log"
+            - "--accesslog=true"
+            - "--accesslog.filepath=/var/log/traefik-access.log"
+            - "--providers.docker.network=mc_mc_net"
+            - "--providers.docker=true"
+            - "--providers.docker.exposedbydefault=false"
+            - "--entryPoints.web.address=:80"
+        labels:
+            - traefik.enable=true
+            - traefik.http.routers.mydashboard.rule=Host(`${TRAEFIK_DASHBOARD_EXTERNAL_DOMAIN}`)
+            - traefik.http.routers.mydashboard.service=api@internal
+        ports:
+            - "${TRAEFIK_HTTP_PORT}:80"
+            - "${TRAEFIK_DASHBOARD_PORT}:8080"
+        volumes:
+            - "./local/traefik_letsencrypt:/letsencrypt"
+            - "./local/traefik_logs:/var/log"
+            - "/var/run/docker.sock:/var/run/docker.sock:ro"
+        networks:
+            - mc_net
 
 #    minecraft-r:
 #        extends:
