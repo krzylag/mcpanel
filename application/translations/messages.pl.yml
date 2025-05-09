@@ -9,7 +9,8 @@ wrong_password: Błędne hasło!
 
 dashboard:
     menu:
-        users: Administratorzy
+        administrators: Administratorzy
+        players: Gracze
         tenants: Serwery
         web_console: Konsola
 

@@ -44,7 +44,8 @@ class DashboardController extends AbstractDashboardController
     public function configureMenuItems(): iterable
     {
         yield MenuItem::linkToDashboard('Dashboard', 'fa fa-home');
-        yield MenuItem::linkToCrud('dashboard.menu.users', 'fas fa-solid fa-users', User::class);
+        yield MenuItem::linkToCrud('dashboard.menu.administrators', 'fas fa-solid fa-users', User::class)->setController(AdminCrudController::class);
+        yield MenuItem::linkToCrud('dashboard.menu.players', 'fas fa-solid fa-gamepad', User::class)->setController(PlayerCrudController::class);
         yield MenuItem::linkToCrud('dashboard.menu.tenants', 'fas fa-solid fa-server', Tenant::class);
         yield MenuItem::subMenu('dashboard.menu.web_console', 'fa fa-solid fa-display')->setSubItems($this->configureTenantConsoleMenus());
     }

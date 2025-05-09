@@ -4,10 +4,10 @@ namespace App\Controller\Admin;
 
 use App\Entity\Tenant;
 use App\Service\TenantService;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Field\ChoiceField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
-use EasyCorp\Bundle\EasyAdminBundle\Field\TextEditorField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
 
 class TenantCrudController extends AbstractCrudController
@@ -24,13 +24,12 @@ class TenantCrudController extends AbstractCrudController
 
     public function configureFields(string $pageName): iterable
     {
-        if ($pageName === 'index') {
+        if ($pageName === Crud::PAGE_INDEX) {
             return $this->configureFieldsOnIndex();
         } else {
             return $this->configureFieldsOnForm();
         }
     }
-
 
     public function configureFieldsOnIndex(): iterable
     {
@@ -46,7 +45,6 @@ class TenantCrudController extends AbstractCrudController
         yield ChoiceField::new('mcTenantId')
             ->setChoices($this->getTenantHostChoices()
         );
-//        yield TextField::new('mcTenantId');
         yield TextField::new('registrationPassword');
     }
 

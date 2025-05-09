@@ -53,3 +53,8 @@ start-game:
 	${DOCKER_COMPOSE_CMD} start minecraft-r
 	${DOCKER_COMPOSE_CMD} start minecraft-p
 	${DOCKER_COMPOSE_CMD} start minecraft-k
+
+install-plugins:
+	${DOCKER_COMPOSE_CMD} cp ./plugins/* minecraft-k:/minecraft/plugins
+	${DOCKER_COMPOSE_CMD} cp ./plugins/* minecraft-p:/minecraft/plugins
+	${DOCKER_COMPOSE_CMD} cp ./plugins/* minecraft-r:/minecraft/plugins
