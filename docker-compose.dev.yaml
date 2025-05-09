@@ -6,6 +6,10 @@ services:
         extends:
             file: docker-compose.yaml
             service: accesspanel
+        build:
+            context: .
+            dockerfile: docker/accesspanel/Dockerfile
+            target: build-dev
         volumes:
             - type: bind
               source: application

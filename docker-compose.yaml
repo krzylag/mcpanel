@@ -6,7 +6,7 @@ services:
         build:
             context: .
             dockerfile: docker/accesspanel/Dockerfile
-            target: build-dev
+            target: build-prod
         depends_on:
             database:
                 condition: service_healthy

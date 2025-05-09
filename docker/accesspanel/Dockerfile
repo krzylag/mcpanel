@@ -71,11 +71,19 @@ COPY ./docker/accesspanel/entrypoint/entrypoint.d-dev/* /entrypoint.d/
 
 FROM build-base AS build-prod
 
+# Expose variabled required for console run
+ENV CONFIGURE_MINECRAFT_HOSTS=${CONFIGURE_MINECRAFT_HOSTS}
+ENV CONFIGURE_MINECRAFT_RCON_PORTS=${CONFIGURE_MINECRAFT_RCON_PORTS}
+ENV CONFIGURE_MINECRAFT_RCON_PASSWORDS=${CONFIGURE_MINECRAFT_RCON_PASSWORDS}
+ENV CONFIGURE_MINECRAFT_JAVA_PORTS=${CONFIGURE_MINECRAFT_JAVA_PORTS}
+ENV CONFIGURE_MINECRAFT_BEDROCK_PORTS=${CONFIGURE_MINECRAFT_BEDROCK_PORTS}
+ENV CONFIGURE_EXTERNAL_DOMAINS=${CONFIGURE_EXTERNAL_DOMAINS}
+
 # Configure PHP
 RUN mv /usr/local/etc/php/php.ini-production /usr/local/etc/php/php.ini
 RUN rm /usr/local/etc/php/php.ini-development
 
 # Build project
-COPY application/* /var/www/html
+COPY ./application /var/www/html
 RUN git config --global --add safe.directory /var/www/html
 RUN composer install --no-interaction
