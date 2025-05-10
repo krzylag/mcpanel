@@ -58,3 +58,8 @@ install-plugins:
 	${DOCKER_COMPOSE_CMD} cp ./plugins/* minecraft-k:/minecraft/plugins
 	${DOCKER_COMPOSE_CMD} cp ./plugins/* minecraft-p:/minecraft/plugins
 	${DOCKER_COMPOSE_CMD} cp ./plugins/* minecraft-r:/minecraft/plugins
+
+traefik-restart:
+	${DOCKER_COMPOSE_CMD} down traefik
+	${DOCKER_COMPOSE_CMD} up -d
+

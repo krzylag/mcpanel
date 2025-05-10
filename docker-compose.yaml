@@ -24,11 +24,12 @@ services:
             - CONFIGURE_MINECRAFT_BEDROCK_PORTS=${BEDROCK_PORT_P} ${BEDROCK_PORT_R} ${BEDROCK_PORT_K}
             - CONFIGURE_EXTERNAL_DOMAINS=${EXTERNAL_DOMAIN_P} ${EXTERNAL_DOMAIN_R} ${EXTERNAL_DOMAIN_K}
         labels:
-            - "traefik.enable=true"
-            - "traefik.http.routers.whoami.entrypoints=${TRAEFIK_ENTRYPOINT}"
-            - "traefik.http.routers.whoami.tls=true"
-            - "traefik.http.routers.whoami.tls.certresolver=${TRAEFIK_CERTIFICATE_RESOLVER_NAME}"
-            - "traefik.http.routers.whoami.rule=Host(`${EXTERNAL_DOMAIN_R}`) || Host(`${EXTERNAL_DOMAIN_P}`) || Host(`${EXTERNAL_DOMAIN_K}`)"
+            - "traefik.http.routers.accesspanel.rule=Host(`${EXTERNAL_DOMAIN_R}`) || Host(`${EXTERNAL_DOMAIN_P}`) || Host(`${EXTERNAL_DOMAIN_K}`)"
+            - "traefik.http.routers.accesspanel.entrypoints=${TRAEFIK_ENTRYPOINT}"
+            - "traefik.http.routers.accesspanel.tls=true"
+            - "traefik.http.routers.accesspanel.tls.certresolver=${TRAEFIK_CERTIFICATE_RESOLVER_NAME}"
+            - "traefik.http.services.accesspanel.loadbalancer.server.port=80"
+
         networks:
             - mc_net
 
@@ -56,13 +57,14 @@ services:
         image: traefik:v3.3
         container_name: traefik
         command:
-            - "--providers.docker=true"
+            - "--api"
+            - "--providers.docker"
             - "--providers.docker.network=mc_mc_net"
             - "--providers.docker.exposedbydefault=false"
             - "--entryPoints.web.address=:80"
             - "--entryPoints.websecure.address=:443"
             - "--entrypoints.websecure.http.tls.certresolver=myresolver"
-            - "--entrypoints.web.http.redirections.entrypoint.to=websecure"
+            - "--entrypoints.web.http.redirections.entrypoint.to=${TRAEFIK_CERTIFICATE_RESOLVER_NAME}"
             - "--entryPoints.web.http.redirections.entrypoint.scheme=https"
             - "--certificatesresolvers.myresolver.acme.tlschallenge=true"
             - "--certificatesresolvers.myresolver.acme.email=${TRAEFIK_LETSENCRYPT_EMAIL}"
