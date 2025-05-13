@@ -1,0 +1,73 @@
+name: mc
+
+services:
+
+    accesspanel:
+        extends:
+            file: docker-compose.base.yaml
+            service: accesspanel
+        build:
+            context: .
+            dockerfile: docker/accesspanel/Dockerfile
+            target: build-prod
+        labels:
+            - "traefik.enable=true"
+            - "traefik.http.routers.accesspanel.rule=Host(`${EXTERNAL_DOMAIN_R}`) || Host(`${EXTERNAL_DOMAIN_P}`) || Host(`${EXTERNAL_DOMAIN_K}`)"
+            - "traefik.http.routers.accesspanel.entrypoints=websecure"
+            - "traefik.http.routers.accesspanel.tls=true"
+            - "traefik.http.routers.accesspanel.tls.certresolver=myresolver"
+            - "traefik.http.services.accesspanel.loadbalancer.server.port=80"
+
+    traefik:
+        extends:
+            file: docker-compose.base.yaml
+            service: traefik
+        command:
+            - "--api=true"
+            - "--api.dashboard=true"
+            - "--api.insecure=true"
+            - "--log.level=INFO"
+            - "--log.filePath=/logs/traefik.log"
+            - "--accesslog=true"
+            - "--accesslog.filepath=/var/log/access.log"
+            - "--providers.docker"
+            - "--providers.docker.network=mc_mc_net"
+            - "--providers.docker.exposedbydefault=false"
+            - "--entryPoints.web.address=:80"
+            - "--entryPoints.websecure.address=:443"
+            - "--entrypoints.websecure.http.tls.certresolver=myresolver"
+            - "--entrypoints.web.http.redirections.entryPoint.to=websecure"
+            - "--entryPoints.web.http.redirections.entryPoint.scheme=https"
+            - "--certificatesresolvers.myresolver.acme.tlschallenge=true"
+            - "--certificatesresolvers.myresolver.acme.email=${TRAEFIK_LETSENCRYPT_EMAIL}"
+            - "--certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json"
+        labels:
+            - traefik.enable=true
+            - traefik.http.routers.mydashboard.rule=Host(`${TRAEFIK_DASHBOARD_EXTERNAL_DOMAIN}`)
+            - traefik.http.routers.mydashboard.entrypoints=${TRAEFIK_ENTRYPOINT}
+            - traefik.http.routers.mydashboard.service=api@internal
+            - traefik.http.routers.mydashboard.middlewares=myauth
+            - traefik.http.middlewares.myauth.basicauth.users=${TRAEFIK_DASHBOARD_HTACCESS_BASIC_AUTH}
+
+    minecraft-r:
+        extends:
+            file: docker-compose.base.yaml
+            service: minecraft-r
+
+    minecraft-p:
+        extends:
+            file: docker-compose.base.yaml
+            service: minecraft-p
+
+    minecraft-k:
+        extends:
+            file: docker-compose.base.yaml
+            service: minecraft-k
+
+    database:
+        extends:
+            file: docker-compose.base.yaml
+            service: database
+
+networks:
+    mc_net:

@@ -23,64 +23,12 @@ services:
             - CONFIGURE_MINECRAFT_JAVA_PORTS=${JAVA_PORT_P} ${JAVA_PORT_R} ${JAVA_PORT_K}
             - CONFIGURE_MINECRAFT_BEDROCK_PORTS=${BEDROCK_PORT_P} ${BEDROCK_PORT_R} ${BEDROCK_PORT_K}
             - CONFIGURE_EXTERNAL_DOMAINS=${EXTERNAL_DOMAIN_P} ${EXTERNAL_DOMAIN_R} ${EXTERNAL_DOMAIN_K}
-        labels:
-            - "traefik.enable=true"
-            - "traefik.http.routers.accesspanel.rule=Host(`${EXTERNAL_DOMAIN_R}`) || Host(`${EXTERNAL_DOMAIN_P}`) || Host(`${EXTERNAL_DOMAIN_K}`)"
-            - "traefik.http.routers.accesspanel.entrypoints=${TRAEFIK_ENTRYPOINT}"
-            - "traefik.http.routers.accesspanel.tls=true"
-            - "traefik.http.routers.accesspanel.tls.certresolver=${TRAEFIK_CERTIFICATE_RESOLVER_NAME}"
-            - "traefik.http.services.accesspanel.loadbalancer.server.port=80"
-
-        networks:
-            - mc_net
-
-    database:
-        image: mariadb:11.7
-        container_name: database
-        restart: unless-stopped
-        volumes:
-            - "./local/mysql_data:/var/lib/mysql"
-        healthcheck:
-            test: [ "CMD", "healthcheck.sh", "--connect", "--innodb_initialized" ]
-            start_period: 10s
-            interval: 5s
-            timeout: 4s
-            retries: 10
-        environment:
-            - MARIADB_ROOT_PASSWORD=${DATABASE_ROOT_PASSWORD}
-            - MARIADB_USER=${DATABASE_USERNAME}
-            - MARIADB_PASSWORD=${DATABASE_PASSWORD}
-            - MARIADB_DATABASE=${DATABASE_NAME}
         networks:
             - mc_net
 
     traefik:
         image: traefik:v3.3
         container_name: traefik
-        command:
-            - "--api=true"
-            - "--api.dashboard=true"
-            - "--api.insecure=true"
-            - "--log.level=INFO"
-            - "--log.filePath=/logs/traefik.log"
-            - "--providers.docker"
-            - "--providers.docker.network=mc_mc_net"
-            - "--providers.docker.exposedbydefault=false"
-            - "--entryPoints.web.address=:80"
-            - "--entryPoints.websecure.address=:443"
-            - "--entrypoints.websecure.http.tls.certresolver=${TRAEFIK_CERTIFICATE_RESOLVER_NAME}"
-            - "--entrypoints.web.http.redirections.entryPoint.to=${TRAEFIK_ENTRYPOINT}"
-            - "--entryPoints.web.http.redirections.entryPoint.scheme=https"
-            - "--certificatesresolvers.myresolver.acme.tlschallenge=true"
-            - "--certificatesresolvers.myresolver.acme.email=${TRAEFIK_LETSENCRYPT_EMAIL}"
-            - "--certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json"
-        labels:
-            - traefik.enable=true
-            - traefik.http.routers.mydashboard.rule=Host(`${TRAEFIK_DASHBOARD_EXTERNAL_DOMAIN}`)
-            - traefik.http.routers.accesspanel.entrypoints=${TRAEFIK_ENTRYPOINT}
-            - traefik.http.routers.mydashboard.service=api@internal
-            - traefik.http.routers.mydashboard.middlewares=myauth
-            - traefik.http.middlewares.myauth.basicauth.users=${TRAEFIK_DASHBOARD_HTACCESS_BASIC_AUTH}
         ports:
             - "${TRAEFIK_HTTP_PORT}:80"
             - "${TRAEFIK_HTTPS_PORT}:443"
@@ -164,6 +112,26 @@ services:
             - MaxMemory=8192
             - CONFIGURE_RCON_PORT=${RCON_PORT_K}
             - CONFIGURE_RCON_PASSWORD=${RCON_PASSWORD_K}
+        networks:
+            - mc_net
+
+    database:
+        image: mariadb:11.7
+        container_name: database
+        restart: unless-stopped
+        volumes:
+            - "./local/mysql_data:/var/lib/mysql"
+        healthcheck:
+            test: [ "CMD", "healthcheck.sh", "--connect", "--innodb_initialized" ]
+            start_period: 10s
+            interval: 5s
+            timeout: 4s
+            retries: 10
+        environment:
+            - MARIADB_ROOT_PASSWORD=${DATABASE_ROOT_PASSWORD}
+            - MARIADB_USER=${DATABASE_USERNAME}
+            - MARIADB_PASSWORD=${DATABASE_PASSWORD}
+            - MARIADB_DATABASE=${DATABASE_NAME}
         networks:
             - mc_net
 

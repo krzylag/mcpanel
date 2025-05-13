@@ -4,7 +4,7 @@ include application/.env.local
 export $(shell sed 's/=.*//' application/.env)
 export $(shell sed 's/=.*//' application/.env.local)
 
-DOCKER_COMPOSE_CMD_PROD=docker compose --progress plain --env-file application/.env --env-file application/.env.prod --env-file application/.env.local -f docker-compose.yaml
+DOCKER_COMPOSE_CMD_PROD=docker compose --progress plain --env-file application/.env --env-file application/.env.local -f docker-compose.prod.yaml
 DOCKER_COMPOSE_CMD_DEV=docker compose --progress plain --env-file application/.env --env-file application/.env.local -f docker-compose.dev.yaml
 
 ifeq ("$(APP_ENV)","prod")
@@ -38,7 +38,7 @@ init-db:
 npm-build:
 	${DOCKER_COMPOSE_CMD} exec accesspanel bash -c "sudo -u www-data npm run build"
 
-migration:
+migrate:
 	${DOCKER_COMPOSE_CMD} exec accesspanel bash -c "sudo -u www-data ./bin/console make:migration --no-interaction"
 
 bash:
