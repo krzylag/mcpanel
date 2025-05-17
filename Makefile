@@ -63,3 +63,7 @@ traefik-restart:
 	${DOCKER_COMPOSE_CMD} down traefik
 	${DOCKER_COMPOSE_CMD} up -d
 
+create-first-admin:
+	${DOCKER_COMPOSE_CMD} exec accesspanel bash -c "sudo -u www-data bin/console app:create-superadmin admin"
+
+

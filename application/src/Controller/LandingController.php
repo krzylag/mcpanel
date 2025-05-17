@@ -11,6 +11,6 @@ class LandingController extends AbstractController
     #[Route(path: '/', name: 'app_landing')]
     public function index(): Response
     {
-        return $this->render('landing.html.twig');
+        return $this->redirectToRoute('admin');
     }
 }
